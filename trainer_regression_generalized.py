@@ -5,13 +5,15 @@ import numpy as np
 from sklearn import linear_model
 from sklearn.preprocessing import MinMaxScaler
 from sklearn.preprocessing import StandardScaler
+from datetime import datetime
+import matplotlib.pyplot as plt
 
 
 # We will have the Diabetes training file to read
-training_file = "/home/supriyo/work/blogs/machinelearning/datasets/Diabetes-Data/training_data.csv"
+training_file = "/home/supriyo/work/machine_learning/machinelearning/datasets/Diabetes-Data/training_data.csv"
 
 # We also have the test data that we will need to verify our prediction results.
-test_file = "/home/supriyo/work/blogs/machinelearning/datasets/Diabetes-Data/final_data_test.csv"
+test_file = "/home/supriyo/work/machine_learning/machinelearning/datasets/Diabetes-Data/final_data_test.csv"
 
 column_to_determine = "Pre-lunch blood glucose measurement"
 #column_predictor = "NPH insulin dose"
@@ -45,21 +47,56 @@ if __name__ == "__main__":
         print str(pred)
 
     # Plot graphs for the 2 selected features:
-    import matplotlib.pyplot as plt
-    prelunchfile = open("datasets/Diabetes-Data/csv_data_diabetes/Pre-lunch_blood_glucose_measurement.csv", "r")
+    prelunchfile = open("/home/supriyo/work/machine_learning/machinelearning/datasets/Diabetes-Data/csv_data_diabetes/Pre-lunch_blood_glucose_measurement.csv", "r")
     prelunchdatalines = prelunchfile.readlines()
     prelunchfile.close()
     prelunchdata = {}
+    startrow = 1
     for line in prelunchdatalines:
+        if startrow:
+            startrow = 0
+            continue
         datarows = line.split(",")
-        prelunchdata[datarows[0] + " " + datarows[1]] = datarows[2]
-    nphinsulinbasefile = open("datasets/Diabetes-Data/csv_data_diabetes/Post-lunch_blood_glucose_measurement.csv", "r")
-    nphinsulinbaselines = nphinsulinbasefile.readlines()
-    nphinsulinbasefile.close()
-    nphinsulindata = {}
-    for line2 in nphinsulinbaselines:
+        datarowsparts = datarows[0].split("-")
+        datarows[0] = datarowsparts[2] + datarowsparts[0] + datarowsparts[1]
+        datarowsparts = datarows[1].split(":")
+        datarows[1] = datarowsparts[0] + datarowsparts[1]
+        """
+        datetimestr = datarows[0] + " " + datarows[1]
+        print datetimestr, "###############################"
+        try:
+            datetimeobj = datetime.strptime(datetimestr, "%m-%d-%Y %H:%M")
+        except:
+            continue
+        """
+        prelunchdata[datarows[0] + datarows[1]] = datarows[2]
+        #print datarows[0] + datarows[1], "##################################"
+        #prelunchdata[datetimeobj] = datarows[2]
+    postlunchbasefile = open("/home/supriyo/work/machine_learning/machinelearning/datasets/Diabetes-Data/csv_data_diabetes/Post-lunch_blood_glucose_measurement.csv", "r")
+    postlunchbaselines = postlunchbasefile.readlines()
+    postlunchbasefile.close()
+    postlunchdata = {}
+    startrow = 1
+    for line2 in postlunchbaselines:
+        if startrow:
+            startrow = 0
+            continue
         datarows2 = line2.split(",")
-        nphinsulindata[datarows2[0] + " " + datarows2[1]] = datarows2[2]
+        datarows2parts = datarows2[0].split("-")
+        datarows2[0] = datarows2parts[2] + datarows2parts[0] + datarows2parts[1]
+        datarows2parts = datarows2[1].split(":")
+        datarows2[1] = datarows2parts[0] + datarows2parts[1]
+        """
+        datetimestr = datarows2[0] + " " + datarows2[1]
+        datetimeobj = datetime.strptime(datetimestr, "%m-%d-%Y %H:%M")
+        try:
+            datetimeobj = datetime.strptime(datetimestr, "%m-%d-%Y %H:%M")
+        except:
+            continue
+        """
+        postlunchdata[datarows2[0] + datarows2[1]] = datarows2[2]
+        #postlunchdata[datetimeobj] = datarows2[2]
+        #print datarows2[0] + datarows2[1], "##################################"
 
     prelunchxticks = prelunchdata.keys()
     prelunchyticks = []
@@ -76,24 +113,24 @@ if __name__ == "__main__":
     prelunchyticks = prelunchyticks[:100]
     #### EXPERIMENTAL DATA ENDS ####
     #print prelunchxticks, "HHHHHHHHHHHHHHHHHHHHHHHHH\n"
-    plt.plot(prelunchxticks, prelunchyticks, label="pre lunch blood glucose", color="red")
+    plt.plot(prelunchxticks, prelunchyticks, label="Pre lunch blood glucose", color="red")
     
-    nphinsulinxticks = nphinsulindata.keys()
-    nphinsulinyticks = []
-    for nphtick in  nphinsulinxticks:
-        nphval = nphinsulindata[nphtick]
+    postlunchxticks = postlunchdata.keys()
+    postlunchyticks = []
+    for nphtick in  postlunchxticks:
+        nphval = postlunchdata[nphtick]
         nphval = nphval.rstrip("\n")
         try:
             nphval = float(nphval)
         except:
             nphval = 0.0
-        nphinsulinyticks.append(nphval)
+        postlunchyticks.append(nphval)
     #### EXPERIMENTAL SEGMENT DATA ####
-    nphinsulinxticks = nphinsulinxticks[:100]
-    nphinsulinyticks = nphinsulinyticks[:100]
+    postlunchxticks = postlunchxticks[:100]
+    postlunchyticks = postlunchyticks[:100]
     #### EXPERIMENTAL DATA ENDS ####
-    #print nphinsulinxticks, "GGGGGGGGGGGGGGGGGG\n"
-    plt.plot(nphinsulinxticks, nphinsulinyticks, label="Post-lunch blood glucose measurement", color="blue")
+    #print postlunchxticks, "GGGGGGGGGGGGGGGGGG\n"
+    plt.plot(postlunchxticks, postlunchyticks, label="Post lunch blood glucose measurement", color="blue")
     
     plt.xlabel('time') 
     plt.ylabel('values') 
@@ -102,7 +139,6 @@ if __name__ == "__main__":
     
     plt.show()
     
-        
 #####################
 ## TO DO: ##
 ## 1. The date values in X-axis are stored in form of strings. They should be in the form of valid datetime values.
@@ -110,7 +146,7 @@ if __name__ == "__main__":
 
 ## Author: Supriyo Mitra.
 
-        
+
         
 
 
